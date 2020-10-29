@@ -9,7 +9,7 @@ putenv("APP_EVENTS_CACHE=/tmp/events.php");
 putenv("APP_PACKAGES_CACHE=/tmp/packages.php");
 putenv("APP_ROUTES_CACHE=/tmp/routes.php");
 putenv("APP_SERVICES_CACHE=/tmp/services.php");
-putenv("VIEW_COMPILED_PATH=/tmp/views");
+putenv("VIEW_COMPILED_PATH=/tmp");
 
 if (!getenv('CACHE_DRIVER'))
     putenv("CACHE_DRIVER=array");
