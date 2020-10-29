@@ -5,6 +5,12 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/webhook', function () {
+    $hash = request()->header('X-Hub-Signature-256');
+    $rawPayload = file_get_contents('php://input');
+    $computedHash = 'sha256='.hash_hmac('sha256', $rawPayload, env('GITHUB_WEBHOOK_SECRET'));
+
+    if (! hash_equals($computedHash, $hash)) throw new \Exception('Hook secret does not match.');
+
     $event = request()->header('X-GitHub-Event');
     $action = request('action');
 
@@ -14,12 +20,12 @@ Route::post('/webhook', function () {
 
 function checkForReOpenComment($issue, $comment)
 {
-    if (trim($comment['body']) === 'REOPEN' && $issue['state'] === 'closed') return;
-
-    // Re-open issue
-    Http::withToken(env('GITHUB_TOKEN'))->patch('https://api.github.com/repos/livewire/livewire/issues/'.$issue['number'], [
-        'state' => 'open',
-    ]);
+    if (trim($comment['body']) === 'REOPEN' && $issue['state'] === 'closed') {
+        // Re-open issue
+        $response = Http::withToken(env('GITHUB_TOKEN'))->patch('https://api.github.com/repos/livewire/livewire/issues/'.$issue['number'], [
+            'state' => 'open',
+        ]);
+    }
 }
 
 function autoReplyForReOpen($issue)
