@@ -1,0 +1,25 @@
+{
+    "version": 2,
+    "functions": {
+        "api/index.php": {
+            "runtime": "vercel-php@0.3.1"
+        }
+    },
+    "routes": [
+        {
+            "src": "/(.*)\\.(.*)$",
+            "dest": "public/$1.$2"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/vercel.php"
+        }
+    ],
+    "env": {
+        "APP_NAME": "Vercel Laravel",
+        "APP_KEY": "base64:y7JVpbQGASff5i1jezGBEqwfXKl7Tcrs4SyKzNbGP/c=",
+        "APP_ENV": "production",
+        "APP_DEBUG": "true",
+        "APP_URL": "https://l8vercel.vercel.app"
+    }
+}
