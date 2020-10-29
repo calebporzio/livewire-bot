@@ -1,1 +1,1 @@
-## Livewire GitHub Issues Bot
+## Livewire GitHub Bot
