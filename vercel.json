@@ -1,7 +1,7 @@
 {
     "version": 2,
     "functions": {
-        "api/index.php": {
+        "api/vercel.php": {
             "runtime": "vercel-php@0.3.1"
         }
     },
@@ -12,14 +12,12 @@
         },
         {
             "src": "/(.*)",
-            "dest": "/vercel.php"
+            "dest": "/api/vercel.php"
         }
     ],
     "env": {
-        "APP_NAME": "Vercel Laravel",
-        "APP_KEY": "base64:y7JVpbQGASff5i1jezGBEqwfXKl7Tcrs4SyKzNbGP/c=",
         "APP_ENV": "production",
-        "APP_DEBUG": "true",
-        "APP_URL": "https://l8vercel.vercel.app"
+        "APP_DEBUG": "false",
+        "APP_URL": "https://bot.laravel-livewire.com"
     }
 }

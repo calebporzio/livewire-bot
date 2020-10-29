@@ -20,4 +20,4 @@ if (!getenv('LOG_CHANNEL'))
 if (!getenv('SESSION_DRIVER'))
     putenv("SESSION_DRIVER=array");
 
-require __DIR__ . '/public/index.php';
+require __DIR__ . '/../public/index.php';
