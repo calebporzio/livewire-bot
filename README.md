@@ -1,1 +1,1 @@
-## Livewire GitHub Bot (Refresh)
+## Livewire GitHub Bot
