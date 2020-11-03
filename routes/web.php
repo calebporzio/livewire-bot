@@ -71,7 +71,7 @@ function autoFillOutRelease($release)
 
         return Carbon::parse($pull['merged_at'])->isAfter(Carbon::parse($lastRelease['published_at']));
     })->map(function ($pull) {
-        return '* '.$pull['title'].' ['.$pull['number'].']('.$pull['url'].')';
+        return '* '.$pull['title'].' [#'.$pull['number'].']('.$pull['html_url'].')';
     })->implode("\n");
 
     Http::withToken(env('GITHUB_TOKEN'))->patch('https://api.github.com/repos/livewire/livewire/releases/'.$release['id'], [
