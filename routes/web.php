@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
@@ -16,6 +17,7 @@ Route::post('/webhook', function () {
 
     if ($event === 'issue_comment' && $action === 'created') return checkForReOpenComment(request('issue'), request('comment'));
     if ($event === 'issues' && $action === 'closed') return autoReplyForReOpen(request('issue'));
+    if ($event === 'release' && $action === 'created') return autoFillOutRelease(request('release'));
 });
 
 function checkForReOpenComment($issue, $comment)
@@ -48,4 +50,33 @@ Reply "REOPEN" to this comment and we'll happily re-open it for you!
 (More info on this philosophy here: https://twitter.com/calebporzio/status/1321864801295978497)
 EOT
     ]);
+}
+
+function autoFillOutRelease($release)
+{
+    if (! $release['draft']) return;
+
+    $releases = Http::withToken(env('GITHUB_TOKEN'))->get('https://api.github.com/repos/livewire/livewire/releases')->json();
+
+    $lastRelease = collect($releases)->first(function ($r) use ($release) {
+        return ! $r['draft'] && $r['target_commitish'] === $release['target_commitish'];
+    });
+
+    $since = $lastRelease['published_at'];
+
+    $pulls = Http::withToken(env('GITHUB_TOKEN'))->get('https://api.github.com/repos/livewire/livewire/pulls', ['state' => 'closed', 'sort' => 'updated', 'direction' => 'desc', 'base' => $release['target_commitish']])->json();
+
+    $references = collect($pulls)->filter(function($pull) use ($lastRelease) {
+        if (! $pull['merged_at']) return false;
+
+        return Carbon::parse($pull['merged_at'])->isAfter(Carbon::parse($lastRelease['published_at']));
+    })->map(function ($pull) {
+        return '* '.$pull['title'].' ['.$pull['number'].']('.$pull['url'].')';
+    })->implode("\n");
+
+    Http::withToken(env('GITHUB_TOKEN'))->patch('https://api.github.com/repos/livewire/livewire/releases/'.$release['id'], [
+        'body' => "## Added\n\n## Fixed\n\n".$references,
+    ])->json();
+
+    return $references;
 }
